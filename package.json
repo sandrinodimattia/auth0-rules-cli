@@ -1,0 +1,25 @@
+{
+  "name": "auth0-rule-deploy",
+  "version": "1.0.0",
+  "description": "Small CLI tool to deploy rules",
+  "main": "deploy-rule.js",
+  "dependencies": {
+    "chalk": "^1.1.1",
+    "cli-table": "^0.3.1",
+    "commander": "^2.9.0",
+    "lodash": "^4.3.0",
+    "nconf": "^0.8.4"
+  },
+  "engines": {
+    "node": "5.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "auth0"
+  ],
+  "author": "Sandrino Di Mattia",
+  "license": "MIT"
+}

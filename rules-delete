@@ -1,0 +1,47 @@
+#!/usr/bin/env node
+const _ = require('lodash');
+const fs = require('fs');
+const chalk = require('chalk');
+const program = require('commander');
+program
+  .option('-n, --name [name]', 'name of the rule')
+  .option('-s, --stage [stage_name]', 'rule stage (login_success/login_failure/user_registration)')
+  .parse(process.argv);
+
+if (!program.name || !program.stage) {
+  program.help();
+  process.exit(1);
+}
+  
+const nconf = require('nconf');
+nconf.argv()
+  .env()
+  .file({ file: './config.json' });
+  
+console.log(chalk.blue(' Deleting rule:'), program.name);
+
+try {
+  const ManagementClient = require('auth0').ManagementClient;
+  const management = new ManagementClient({
+    token: nconf.get('AUTH0_API_TOKEN'),
+    domain: nconf.get('AUTH0_DOMAIN')
+  });
+
+  management.rules.getAll({ stage: program.stage })
+    .then((rules) => {
+      const rule = _.find(rules, { 'name': program.name });
+      if (!rule) {
+        throw new Error('Could not find rule ' + program.name + ' in ' + program.stage);
+      } else {
+        return management.rules.delete({ id: rule.id });
+      }
+    })
+    .then(() => {
+      console.log(chalk.green(' Rule deleted:'), program.name, '\n');
+    })
+    .catch((err) => {
+      console.log(chalk.red(' Error: %s\n'), err.message || err.name || err.status);
+    });
+} catch(e) {
+  console.log(chalk.red(' Error: %s\n'), e.message || e.name);
+}

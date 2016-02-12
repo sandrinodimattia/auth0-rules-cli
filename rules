@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+
+console.log('\n  Auth0 Rules CLI\n');
+
+const program = require('commander');
+program
+  .version('1.0.0')
+  .command('list', 'list the current rules you have enabled')
+  .command('delete', 'delete a rule')
+  .command('deploy', 'deploy a rule')
+  .parse(process.argv);
+
+// Initialize configuration.
+/* if (!program.rule || !program.stage) {
+  program.help();
+  process.exit();
+}*/
+/*
+console.log(program);
+console.log('  - %s template engine', program.templateEngine);
+console.log('  - %s cheese', program.cheese);
+console.log('  - %j', program.list);
+*/

@@ -1,0 +1,46 @@
+#!/usr/bin/env node
+
+const Table = require('cli-table');
+const chalk = require('chalk');
+const program = require('commander');
+const nconf = require('nconf');
+nconf.argv()
+  .env()
+  .file({ file: './config.json' });
+  
+console.log(chalk.blue(' Listing rules...'));
+
+try {
+  const ManagementClient = require('auth0').ManagementClient;
+  const management = new ManagementClient({
+    token: nconf.get('AUTH0_API_TOKEN'),
+    domain: nconf.get('AUTH0_DOMAIN')
+  });
+
+  var table = new Table({
+    head: ['Name', 'Stage', 'Order', 'Enabled'], 
+    colWidths: [35, 15, 10, 10]
+  });
+  
+  function addRules(rules) {
+    rules.forEach((rule) => {
+      table.push([rule.name, rule.stage, rule.order, rule.enabled]);
+    });
+    return;
+  };
+
+  management.rules.getAll({ stage: 'login_success' })
+    .then(addRules)
+    .then(() => management.rules.getAll({ stage: 'login_failure' }))
+    .then(addRules)
+    .then(() => management.rules.getAll({ stage: 'user_registration' }))
+    .then(addRules)
+    .then(() => {
+      console.log(table.toString(), '\n');
+    })
+    .catch((err) => {
+      console.log(chalk.red(' Error: %s'), err.message || err.name || err.status);
+    });
+} catch(e) {
+  console.log(chalk.red(' Error: %s'), e.message || e.name);
+}
